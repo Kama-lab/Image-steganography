@@ -1,5 +1,6 @@
 import cv2
 import binascii
+import numpy as np
 
 TARGET_BITS = 2
 
@@ -45,8 +46,10 @@ def calc_image_storage(imageSize,channels):
 
 
 
-def hide_text(image,text):
+def encode(image,text):
 	image = cv2.imread(image)
+	storage_size = calc_image_storage(image.shape[:2],image.shape[2])
+	written_size = 0
 	file = open(text,"r")
 	print(image)
 	nBits = []
@@ -54,10 +57,8 @@ def hide_text(image,text):
 	nthChar = 0
 	char = file.read(nthChar+1)[nthChar:]
 	binChar = bin(int.from_bytes(char.encode(),"big"))[2:]
-	print(binChar)
-	for row in image:
-		for col in row:
-			print("Initial:",col)
+	for row in range(image.shape[0]):
+		for col in range(image.shape[1]):
 			for i in range(6):
 				try:
 					nBits.append(binChar[nthBit])
@@ -69,27 +70,15 @@ def hide_text(image,text):
 					print("Char:",char)
 					binChar = bin(int.from_bytes(char.encode(),"big"))[2:]
 					nBits.append(binChar[nthBit])
-			#print([nBits[0]+nBits[1],nBits[2]+nBits[3],nBits[4]+nBits[5]])
-			image[row][col] = insert_bits(col,[nBits[0]+nBits[1],nBits[2]+nBits[3],nBits[4]+nBits[5]])
+			image[row][col] = insert_bits(image[row][col],[nBits[0]+nBits[1],nBits[2]+nBits[3],nBits[4]+nBits[5]])
+			written_size += 6
+			print(f"{storage_size}/{written_size}")
 			nBits = []
-			print("Result:",image[row][col])
 
 	print(image)
 	cv2.imshow("img",image)
 	cv2.waitKey(0)
 			
 
-#hide_text(,"res/test.txt")
-hide_text("res/test_image2.png","res/test.txt")
+encode("res/test_image2.png","res/test.txt")
 
-
-
-
-
-#insert_bits([255,238,5],['10','00','11'])			
-
-
-
-
-
-#print(convert_to_dec(convert_to_bin([255,238,5])))
