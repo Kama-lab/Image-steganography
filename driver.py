@@ -53,24 +53,26 @@ def hide_text(image,text):
 	nthBit = 0
 	nthChar = 0
 	char = file.read(nthChar+1)[nthChar:]
-	#binChar = bin(int(binascii.hexlify(char), 16))[2:]
-	binChar = bin(int.from_bytes(char.encode(),"big"))
+	binChar = bin(int.from_bytes(char.encode(),"big"))[2:]
 	print(binChar)
 	for row in image:
 		for col in row:
-			for i in range(3):
+			print("Initial:",col)
+			for i in range(6):
 				try:
-					nBits.append(binChar[nthBit]+binChar[nthBit+1])
-					nthBit+=2
+					nBits.append(binChar[nthBit])
+					nthBit+=1
 				except IndexError:
 					nthChar+=1
 					nthBit = 0
 					char = file.read(nthChar+1)[nthChar:]
-					nBits.append(binChar[nthBit]+binChar[nthBit+1])
-			print(nBits)
-			#print(map("".join(),[nBits[:2],nBits[2:4],nBits[4:]]))
-			image[row,col] = insert_bits(col,[nBits[:2],nBits[2:4],nBits[4:5]])
+					print("Char:",char)
+					binChar = bin(int.from_bytes(char.encode(),"big"))[2:]
+					nBits.append(binChar[nthBit])
+			#print([nBits[0]+nBits[1],nBits[2]+nBits[3],nBits[4]+nBits[5]])
+			image[row][col] = insert_bits(col,[nBits[0]+nBits[1],nBits[2]+nBits[3],nBits[4]+nBits[5]])
 			nBits = []
+			print("Result:",image[row][col])
 
 	print(image)
 	cv2.imshow("img",image)
